@@ -1,13 +1,12 @@
 import { useQuery,  useQueryClient, useMutation } from "@tanstack/react-query"
 import {getPokemon} from '../api/pokeapi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 
-function SearchBar({title}) {
+function SearchBar({title,setStatus, statusEnum, setPokemonData, setError}) {
 
   const [searchName, setSearchName] = useState('')
 
-  const queryClient = useQueryClient()
 
   // const {
   //   isLoading,
@@ -16,20 +15,45 @@ function SearchBar({title}) {
   //   data: pokemon
   // } = useQuery({ queryKey: ['pokemon'], queryFn: () => getPokemon('bulbasaur'), enabled:false})
 
-  const mutation = useMutation(() => getPokemon(searchName))
+  const mutation = useMutation(() => getPokemon(searchName.toLocaleLowerCase()))
 
 
   const onSearchSubmit = (e) => {
     e.preventDefault()
-    mutation.mutate()
+    if(searchName){
+      mutation.mutate()
+    }
   }
+
+  useEffect(()=>{
+    if(mutation?.isLoading){
+      setStatus(statusEnum.isLoading)
+    }
+    else if(mutation?.isError){
+      setStatus(statusEnum.isError)
+      setError(mutation.error.message)
+    }
+    else if (mutation.isSuccess) {
+      setStatus(statusEnum.isSuccess)
+      let pokemonObj = {
+        name: mutation.data.name,
+        weight: mutation.data.weight,
+        height: mutation.data.height,
+        sprites: mutation.data.sprites,
+        stats: mutation.data.stats
+      }
+      setPokemonData(mutation.data)
+    }
+  }, [mutation, statusEnum, setStatus, setPokemonData, setError])
+
+
 
   return(
     <>
-      {console.log(mutation?.data?.species.name)}
       <h2 htmlFor="nameField">{title}</h2>
       <form onSubmit={onSearchSubmit}>
         <input type="text" placeholder={"e.g. bulbasaur"} id="nameField" onChange={(e) => setSearchName(e.target.value)}></input>
+        <button>Cerca</button>
       </form>
     </>
   )
