@@ -1,9 +1,9 @@
 import { useQuery,  useQueryClient, useMutation } from "@tanstack/react-query"
 import {getPokemon} from '../api/pokeapi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 
-function SearchBar({title,setStatus, statusEnum, setPokemonData, setError}) {
+function SearchBar({title,setStatus, statusEnum, setPokemonData, setError, pokemonData}) {
 
   const [searchName, setSearchName] = useState('')
 
@@ -21,30 +21,39 @@ function SearchBar({title,setStatus, statusEnum, setPokemonData, setError}) {
   const onSearchSubmit = (e) => {
     e.preventDefault()
     if(searchName){
+      mutation.reset()
       mutation.mutate()
     }
   }
 
+  const emptyobj = useMemo(() => {return {}}, [])
+
   useEffect(()=>{
-    if(mutation?.isLoading){
+    if(mutation.isLoading){
+      // console.log("IS LOADING")
       setStatus(statusEnum.isLoading)
     }
-    else if(mutation?.isError){
+    else if(mutation.isError){
+      // console.log("IS ERROR")
       setStatus(statusEnum.isError)
       setError(mutation.error.message)
+      // console.log(mutation.data)
+      setPokemonData(emptyobj)
     }
     else if (mutation.isSuccess) {
+      // console.log("IS SUCCESS")
       setStatus(statusEnum.isSuccess)
-      let pokemonObj = {
-        name: mutation.data.name,
-        weight: mutation.data.weight,
-        height: mutation.data.height,
-        sprites: mutation.data.sprites,
-        stats: mutation.data.stats
-      }
+      // let pokemonObj = {
+      //   id: mutation.data.id,
+      //   name: mutation.data.name,
+      //   weight: mutation.data.weight,
+      //   height: mutation.data.height,
+      //   sprites: mutation.data.sprites,
+      //   stats: mutation.data.stats
+      // }
       setPokemonData(mutation.data)
     }
-  }, [mutation, statusEnum, setStatus, setPokemonData, setError])
+  }, [mutation, statusEnum, setStatus, setPokemonData, setError, emptyobj])
 
 
 

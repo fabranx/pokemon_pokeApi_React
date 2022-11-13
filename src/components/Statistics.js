@@ -1,8 +1,7 @@
 import { useState } from "react"
 
-function Statistics({status, statusEnum, pokemonData, error}) {
+function Statistics({status, statusEnum, pokemonData, error, spriteEnum}) {
 
-  const spriteEnum = Object.freeze({'front_default': 'front_default', 'front_shiny': 'front_shiny'})
   const [spriteType, setSpriteType] = useState(spriteEnum.front_default)
 
   let content;
@@ -15,6 +14,7 @@ function Statistics({status, statusEnum, pokemonData, error}) {
   else if(status === statusEnum.isSuccess && pokemonData){
     content = (
       <>
+        <h2>Ecco i tuoi risultati per [{pokemonData.name}]</h2>
         <div className="row text-center mb">
           <div className="column">
             <p>Nome: {pokemonData.name}</p>
@@ -45,10 +45,10 @@ function Statistics({status, statusEnum, pokemonData, error}) {
           <div className="column">
             <h4>Statistiche</h4>
             {pokemonData.stats.map(stat => (
-              <>
+              <div key={stat.stat.name}>
                 <label>{stat.stat.name}</label>
                 <progress max={100} value={stat.base_stat}></progress>
-              </>
+              </div>
             ))}
           </div>
         </div>
