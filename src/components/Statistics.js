@@ -1,6 +1,7 @@
 import { useState } from "react"
+import {spriteEnum, statusEnum, errorEnum} from "../enums"
 
-function Statistics({status, statusEnum, pokemonData, error, spriteEnum}) {
+function Statistics({status, pokemonData, error}) {
 
   const [spriteType, setSpriteType] = useState(spriteEnum.front_default)
 
@@ -9,13 +10,13 @@ function Statistics({status, statusEnum, pokemonData, error, spriteEnum}) {
     content = <p>Loading...</p>
   }
   else if(status === statusEnum.isError){
-    content = <p>{error}</p>
+    content = <p>{error === errorEnum.not_found ? "Errore : Pokemon non trovato" : error}</p>
   }
   else if(status === statusEnum.isSuccess && pokemonData){
     content = (
       <>
         <h2>Ecco i tuoi risultati per [{pokemonData.name}]</h2>
-        <div className="row text-center mb">
+        <div className="row center mb">
           <div className="column">
             <p>Nome: {pokemonData.name}</p>
           </div>
@@ -27,8 +28,7 @@ function Statistics({status, statusEnum, pokemonData, error, spriteEnum}) {
           </div>
         </div>
 
-        <div className="row text-center">
-
+        <div className="row center">
           <div className="column">
             <img alt="pokemon" className="pokemon-sprite" src={pokemonData.sprites[spriteType]}></img>
           </div>
@@ -52,7 +52,6 @@ function Statistics({status, statusEnum, pokemonData, error, spriteEnum}) {
             ))}
           </div>
         </div>
-          
       </>
     )
   }

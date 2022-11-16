@@ -1,27 +1,17 @@
-import { useQuery,  useQueryClient, useMutation } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import {getPokemon} from '../api/pokeapi'
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import {statusEnum} from '../enums'
 
-
-function SearchBar({title,setStatus, statusEnum, setPokemonData, setError, pokemonData}) {
+function SearchBar({title,setStatus, setPokemonData, setError}) {
 
   const [searchName, setSearchName] = useState('')
 
-
-  // const {
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   data: pokemon
-  // } = useQuery({ queryKey: ['pokemon'], queryFn: () => getPokemon('bulbasaur'), enabled:false})
-
   const mutation = useMutation(() => getPokemon(searchName.toLocaleLowerCase()))
-
 
   const onSearchSubmit = (e) => {
     e.preventDefault()
     if(searchName){
-      mutation.reset()
       mutation.mutate()
     }
   }
@@ -30,32 +20,21 @@ function SearchBar({title,setStatus, statusEnum, setPokemonData, setError, pokem
 
   useEffect(()=>{
     if(mutation.isLoading){
-      // console.log("IS LOADING")
       setStatus(statusEnum.isLoading)
     }
     else if(mutation.isError){
-      // console.log("IS ERROR")
+      console.log(mutation.error)
       setStatus(statusEnum.isError)
       setError(mutation.error.message)
-      // console.log(mutation.data)
       setPokemonData(emptyobj)
+      mutation.reset()
     }
     else if (mutation.isSuccess) {
-      // console.log("IS SUCCESS")
       setStatus(statusEnum.isSuccess)
-      // let pokemonObj = {
-      //   id: mutation.data.id,
-      //   name: mutation.data.name,
-      //   weight: mutation.data.weight,
-      //   height: mutation.data.height,
-      //   sprites: mutation.data.sprites,
-      //   stats: mutation.data.stats
-      // }
       setPokemonData(mutation.data)
+      mutation.reset()
     }
-  }, [mutation, statusEnum, setStatus, setPokemonData, setError, emptyobj])
-
-
+  }, [mutation, setStatus, setPokemonData, setError, emptyobj])
 
   return(
     <>
